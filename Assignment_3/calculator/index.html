@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Expression Calculator</title>
+
+<style>
+    body {
+        font-family: Arial;
+        background: linear-gradient(135deg,#74ebd5,#9face6);
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .calculator {
+        background: white;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        width: 260px;
+        text-align: center;
+    }
+
+    #display {
+        width: 100%;
+        height: 40px;
+        font-size: 18px;
+        margin-bottom: 10px;
+        text-align: right;
+        padding: 5px;
+    }
+
+    .buttons {
+        display: grid;
+        grid-template-columns: repeat(4,1fr);
+        gap: 8px;
+    }
+
+    button {
+        padding: 12px;
+        font-size: 16px;
+        border: none;
+        border-radius: 8px;
+        background: #4CAF50;
+        color: white;
+        cursor: pointer;
+    }
+
+    .operator { background:#ff9800; }
+    .equal { background:#2196F3; }
+    .clear { background:#f44336; }
+</style>
+</head>
+
+<body>
+
+<div class="calculator">
+    <h2>Calculator</h2>
+
+    <!-- Display -->
+    <input type="text" id="display" readonly>
+
+    <!-- Buttons -->
+    <div class="buttons">
+        <button class="clear" onclick="clearDisplay()">C</button>
+        <button onclick="square()">x²</button>
+        <button onclick="deleteLast()">⌫</button>
+        <button class="operator" onclick="appendOperator('/')">÷</button>
+
+        <button onclick="appendNumber(7)">7</button>
+        <button onclick="appendNumber(8)">8</button>
+        <button onclick="appendNumber(9)">9</button>
+        <button class="operator" onclick="appendOperator('*')">×</button>
+
+        <button onclick="appendNumber(4)">4</button>
+        <button onclick="appendNumber(5)">5</button>
+        <button onclick="appendNumber(6)">6</button>
+        <button class="operator" onclick="appendOperator('-')">−</button>
+
+        <button onclick="appendNumber(1)">1</button>
+        <button onclick="appendNumber(2)">2</button>
+        <button onclick="appendNumber(3)">3</button>
+        <button class="operator" onclick="appendOperator('+')">+</button>
+
+        <button onclick="appendNumber(0)">0</button>
+        <button onclick="promptInput()">Prompt</button>
+        <button class="equal" onclick="calculate()">=</button>
+    </div>
+</div>
+
+<script>
+
+function appendNumber(num) {
+    document.getElementById("display").value += num;
+}
+
+function appendOperator(op) {
+    let display = document.getElementById("display").value;
+
+    if (display === "") {
+        alert("Enter number first!");
+        return;
+    }
+
+    let lastChar = display.slice(-1);
+
+    // Prevent double operators
+    if (["+","-","*","/"].includes(lastChar)) {
+        alert("Operator already added!");
+        return;
+    }
+
+    document.getElementById("display").value += op;
+}
+
+function calculate() {
+    let expression = document.getElementById("display").value;
+
+    if (expression === "") {
+        alert("Enter calculation first!");
+        return;
+    }
+
+    try {
+        let result = eval(expression);   // Evaluate expression
+        document.getElementById("display").value = result;
+    }
+    catch {
+        alert("Invalid calculation!");
+    }
+}
+
+function square() {
+    let value = document.getElementById("display").value;
+
+    if (value === "" || isNaN(value)) {
+        alert("Enter valid number to square!");
+        return;
+    }
+
+    document.getElementById("display").value = value * value;
+}
+
+function clearDisplay() {
+    document.getElementById("display").value = "";
+}
+
+function deleteLast() {
+    let current = document.getElementById("display").value;
+    document.getElementById("display").value =
+        current.substring(0, current.length - 1);
+}
+
+// Prompt input
+function promptInput() {
+    let value = prompt("Enter a number:");
+
+    if (value === null || value === "" || isNaN(value)) {
+        alert("Invalid input!");
+        return;
+    }
+
+    document.getElementById("display").value = value;
+}
+
+</script>
+
+</body>
+</html>
