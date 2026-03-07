@@ -1,0 +1,26 @@
+<div class="page-center">
+  <div class="form-container">
+    <h2>Student Login</h2>
+
+    <form>
+      <label>Username</label>
+      <input type="text" placeholder="Enter Username" />
+
+      <label>Password</label>
+      <input type="password" placeholder="Enter Password" />
+
+      <button type="submit">Login</button>
+    </form>
+
+    <p>
+      New Student?
+      <a routerLink="/register">Register Here</a>
+    </p>
+  </div>
+</div>
+<script>
+function togglePassword() {
+  const pass = document.getElementById("password");
+  pass.type = pass.type === "password" ? "text" : "password";
+}
+</script>
