@@ -1,0 +1,7 @@
+*.log
+*.class
+*.jar
+*.war
+build/
+tomcat-base/
+node_modules/
