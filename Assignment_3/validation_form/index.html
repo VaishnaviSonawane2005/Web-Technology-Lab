@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Registration Form</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <h2>User Validation Form</h2>
+
+    <form id="registerForm" novalidate>
+
+        <label>Name</label>
+        <input type="text" id="name">
+        <small class="error" id="nameError"></small>
+
+        <label>Email</label>
+        <input type="text" id="email">
+        <small class="error" id="emailError"></small>
+
+        <label>Phone Number</label>
+        <input type="text" id="phone">
+        <small class="error" id="phoneError"></small>
+
+        <label>Password</label>
+        <input type="password" id="password">
+        <small class="error" id="passwordError"></small>
+
+        <button type="submit">Register</button>
+
+    </form>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
