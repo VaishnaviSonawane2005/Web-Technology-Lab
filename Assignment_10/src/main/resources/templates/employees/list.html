@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Employees | Task Management</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div class="sidebar">
+        <h1>TaskForce Pro</h1>
+        <nav>
+            <a href="/">📁 Dashboard</a>
+            <a href="/employees" class="active">👥 Employees</a>
+            <a href="/tasks">📋 Task Board</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <div class="search-bar">
+                <input type="text" placeholder="Search tasks, employees...">
+            </div>
+            <div class="user-profile">
+                <span>Welcome, Admin</span>
+                <div class="avatar">A</div>
+            </div>
+        </header>
+
+        <main>
+            <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h2 style="font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem; background: linear-gradient(135deg, var(--primary-color), var(--accent-color)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Faculty Members</h2>
+                    <p style="color: var(--text-muted); font-weight: 500;">Manage all faculty and staff members</p>
+                </div>
+                <a href="/employees/new" class="btn btn-primary" style="gap: 0.5rem;">
+                    <span>➕</span> Add Member
+                </a>
+            </div>
+        
+        <div class="card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>🆔 ID</th>
+                        <th>👤 Name</th>
+                        <th>✉️ Email</th>
+                        <th>🏢 Department</th>
+                        <th>⚙️ Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="employee : ${employees}">
+                        <td style="font-weight: 600; color: var(--primary-color);" th:text="${employee.id}">1</td>
+                        <td style="font-weight: 600;" th:text="${employee.name}">John Doe</td>
+                        <td style="color: var(--info);" th:text="${employee.email}">john@example.com</td>
+                        <td th:text="${employee.department}">Computer Engineering</td>
+                        <td class="actions-cell">
+                            <form th:action="@{/employees/delete/{id}(id=${employee.id})}" method="post">
+                                <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure?')" style="padding: 0.5rem 1rem; font-size: 0.85rem;">
+                                    🗑️ Delete
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr th:if="${employees.empty}">
+                        <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 3rem;">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">👥</div>
+                            <div style="font-size: 1.1rem; font-weight: 600;">No faculty members added yet</div>
+                            <p style="margin-top: 0.5rem; color: var(--text-muted);">Start by adding your first faculty member</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+    </div>
+</body>
+</html>

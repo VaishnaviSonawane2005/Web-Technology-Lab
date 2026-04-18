@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>ProjectTask Hub - Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div class="sidebar">
+        <h1>ProjectTask Hub</h1>
+        <nav>
+            <a href="/" class="active">📁 Dashboard</a>
+            <a href="/employees">👥 Employees</a>
+            <a href="/tasks">📋 Task Board</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <div class="search-bar">
+                <input type="text" placeholder="Search tasks, employees...">
+            </div>
+            <div class="user-profile">
+                <span>Welcome, Admin</span>
+                <div class="avatar">A</div>
+            </div>
+        </header>
+
+        <main>
+            <div style="margin-bottom: 1.5rem;">
+                <h2 style="font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem; background: linear-gradient(135deg, var(--primary-color), var(--accent-color)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Dashboard</h2>
+                <p style="color: var(--text-muted); font-weight: 500;">Welcome back! Here's your task management overview.</p>
+            </div>
+            
+            <div class="tab-header">
+                <button class="tab-btn active" onclick="switchTab('analytics')">📊 Overview</button>
+                <button class="tab-btn" onclick="switchTab('kanban')">🎯 Kanban Board</button>
+            </div>
+
+            <!-- ANALYTICS TAB -->
+            <div id="analytics" class="tab-content active">
+                <div class="dashboard-stats">
+                    <div class="stat-card stat-card-employees">
+                        <h3>👥 Total Employees</h3>
+                        <div class="value" th:text="${totalEmployees}">0</div>
+                    </div>
+                    <div class="stat-card stat-card-pending">
+                        <h3>⏳ Pending Tasks</h3>
+                        <div class="value" th:text="${pendingTasks}">0</div>
+                    </div>
+                    <div class="stat-card stat-card-completed">
+                        <h3>✅ Completed Tasks</h3>
+                        <div class="value" th:text="${completedTasks}">0</div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2.5rem; margin-top: 2rem;">
+                    <!-- Recent Activity Feed -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>📋 Recent Activity Feed</h2>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>📝 Description</th>
+                                    <th>👤 Employee</th>
+                                    <th>📅 Due Date</th>
+                                    <th>🏷️ Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="t : ${recentTasks}">
+                                    <td th:text="${t.description}"></td>
+                                    <td th:text="${t.employee.name}"></td>
+                                    <td th:text="${t.dueDate}"></td>
+                                    <td>
+                                        <span th:class="'badge badge-' + ${#strings.toLowerCase(t.status).replace('_', '-')}" 
+                                              th:text="${t.status}"></span>
+                                    </td>
+                                </tr>
+                                <tr th:if="${recentTasks.empty}">
+                                    <td colspan="4" style="text-align:center; color: var(--text-muted); padding: 2rem;">
+                                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">📭</div>
+                                        No assigned tasks yet. Get started by creating one!
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>⚡ Quick Actions</h2>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                            <a href="/employees/new" class="btn btn-primary" style="justify-content:center; gap: 0.5rem;">
+                                <span>➕</span> Add Employee
+                            </a>
+                            <button onclick="openModal()" class="btn btn-primary" style="justify-content:center; gap: 0.5rem;">
+                                <span>✨</span> Assign Task
+                            </button>
+                            <a href="/employees" class="btn" style="justify-content:center; background: linear-gradient(135deg, var(--secondary-color), var(--quaternary-color)); color: white; gap: 0.5rem;">
+                                <span>👥</span> View Employees
+                            </a>
+                            <a href="/tasks" class="btn" style="justify-content:center; background: linear-gradient(135deg, var(--success), var(--success-hover)); color: white; gap: 0.5rem;">
+                                <span>📋</span> View All Tasks
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KANBAN BOARD TAB -->
+            <div id="kanban" class="tab-content">
+                <div class="kanban-board">
+                    <!-- Pending Column -->
+                    <div class="kanban-column">
+                        <h3>Pending Tasks</h3>
+                        <div th:each="t : ${allTasks}" th:if="${t.status == 'PENDING'}" class="kanban-card">
+                            <h4 th:text="${t.description}"></h4>
+                            <p><strong>To:</strong> <span th:text="${t.employee.name}"></span><br>
+                               <strong>Due:</strong> <span th:text="${t.dueDate}"></span></p>
+                            <form th:action="@{/tasks/update-status/{id}(id=${t.id})}" method="post">
+                                <select name="status" onchange="this.form.submit()" style="padding: 0.25rem; font-size: 0.8rem;">
+                                    <option value="PENDING" selected>Pending</option>
+                                    <option value="IN_PROGRESS">Move to In Progress -> </option>
+                                    <option value="COMPLETED">Mark Completed V </option>
+                                </select>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <!-- In Progress Column -->
+                    <div class="kanban-column">
+                        <h3>In Progress</h3>
+                        <div th:each="t : ${allTasks}" th:if="${t.status == 'IN_PROGRESS'}" class="kanban-card" style="border-left-color: var(--warning);">
+                            <h4 th:text="${t.description}"></h4>
+                            <p><strong>To:</strong> <span th:text="${t.employee.name}"></span><br>
+                               <strong>Due:</strong> <span th:text="${t.dueDate}"></span></p>
+                            <form th:action="@{/tasks/update-status/{id}(id=${t.id})}" method="post">
+                                <select name="status" onchange="this.form.submit()" style="padding: 0.25rem; font-size: 0.8rem;">
+                                    <option value="PENDING"><- Return to Pending</option>
+                                    <option value="IN_PROGRESS" selected>In Progress</option>
+                                    <option value="COMPLETED">Mark Completed V</option>
+                                </select>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <!-- Completed Column -->
+                    <div class="kanban-column">
+                        <h3>Completed</h3>
+                        <div th:each="t : ${allTasks}" th:if="${t.status == 'COMPLETED'}" class="kanban-card" style="border-left-color: var(--success); opacity: 0.7;">
+                            <h4 style="text-decoration: line-through;" th:text="${t.description}"></h4>
+                            <p><strong>To:</strong> <span th:text="${t.employee.name}"></span></p>
+                            <form th:action="@{/tasks/update-status/{id}(id=${t.id})}" method="post">
+                                <select name="status" onchange="this.form.submit()" style="padding: 0.25rem; font-size: 0.8rem;">
+                                    <option value="PENDING"><- Send to Pending</option>
+                                    <option value="IN_PROGRESS"><- Send to In Progress</option>
+                                    <option value="COMPLETED" selected>Completed</option>
+                                </select>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- FLOATING ASSIGN TASK MODAL -->
+    <div id="taskModal" class="modal-overlay">
+        <div class="modal-content card">
+            <div class="card-header">
+                <h2>Quick Assign Task</h2>
+                <button onclick="closeModal()" style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer;">&times;</button>
+            </div>
+            <form th:action="@{/tasks}" th:object="${task}" method="post">
+                <div class="form-group">
+                    <label>Task Description</label>
+                    <input type="text" th:field="*{description}" required>
+                </div>
+                <div class="form-group">
+                    <label>Task Type</label>
+                    <select th:field="*{taskType}">
+                        <option value="Exam Duty">Exam Duty</option>
+                        <option value="Project Guide Allocation">Project Guide Allocation</option>
+                        <option value="Documentation Work">Documentation Work</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Assign To (Faculty Member)</label>
+                    <select th:field="*{employee.id}">
+                        <option th:each="emp : ${employees}" th:value="${emp.id}" th:text="${emp.name} + ' (' + ${emp.department} + ')'"></option>
+                    </select>
+                </div>
+                <div class="form-group" style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
+                    <div>
+                        <label>Due Date</label>
+                        <input type="date" th:field="*{dueDate}" required>
+                    </div>
+                    <div>
+                        <label>Initial Status</label>
+                        <select th:field="*{status}">
+                            <option value="PENDING">Pending</option>
+                            <option value="IN_PROGRESS">In Progress</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="margin-top: 1.5rem; text-align:right;">
+                    <button type="submit" class="btn btn-primary">Assign Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Interactive Javascript for UI Layout -->
+    <script>
+        function switchTab(tabId) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            // Activate selection
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        function openModal() {
+            document.getElementById('taskModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('taskModal').classList.remove('active');
+        }
+    </script>
+</body>
+</html>

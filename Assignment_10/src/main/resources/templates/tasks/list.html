@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Tasks | Task Management</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div class="sidebar">
+        <h1>TaskForce Pro</h1>
+        <nav>
+            <a href="/">📁 Dashboard</a>
+            <a href="/employees">👥 Employees</a>
+            <a href="/tasks" class="active">📋 Task Board</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <div class="search-bar">
+                <input type="text" placeholder="Search tasks, employees...">
+            </div>
+            <div class="user-profile">
+                <span>Welcome, Admin</span>
+                <div class="avatar">A</div>
+            </div>
+        </header>
+
+        <main>
+            <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h2 style="font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem; background: linear-gradient(135deg, var(--primary-color), var(--accent-color)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Assigned Tasks</h2>
+                    <p style="color: var(--text-muted); font-weight: 500;">View and manage all task assignments</p>
+                </div>
+                <a href="/tasks/new" class="btn btn-primary" style="gap: 0.5rem;">
+                    <span>✨</span> Assign Task
+                </a>
+            </div>
+        
+        <div class="card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>🆔 ID</th>
+                        <th>📝 Description</th>
+                        <th>📚 Type</th>
+                        <th>👤 Assigned To</th>
+                        <th>📅 Due Date</th>
+                        <th>🏷️ Status</th>
+                        <th>⚙️ Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="task : ${tasks}">
+                        <td style="font-weight: 600; color: var(--primary-color);" th:text="${task.id}">1</td>
+                        <td style="font-weight: 500;" th:text="${task.description}">Write report</td>
+                        <td th:text="${task.taskType}">Report Submission</td>
+                        <td style="font-weight: 500;" th:text="${task.employee.name}">Jane Doe</td>
+                        <td th:text="${task.dueDate}">2026-05-01</td>
+                        <td>
+                            <span th:class="'badge badge-' + ${#strings.toLowerCase(task.status).replace('_', '-')}" 
+                                  th:text="${task.status}">PENDING</span>
+                        </td>
+                        <td class="actions-cell" style="gap: 0.5rem;">
+                            <form th:action="@{/tasks/update-status/{id}(id=${task.id})}" method="post" style="display: inline;">
+                                <select name="status" onchange="this.form.submit()" style="padding: 0.4rem 0.7rem; font-size: 0.75rem; width: auto;">
+                                    <option value="PENDING" th:selected="${task.status == 'PENDING'}">Pending</option>
+                                    <option value="IN_PROGRESS" th:selected="${task.status == 'IN_PROGRESS'}">In Progress</option>
+                                    <option value="COMPLETED" th:selected="${task.status == 'COMPLETED'}">Completed</option>
+                                </select>
+                            </form>
+                            <form th:action="@{/tasks/delete/{id}(id=${task.id})}" method="post" style="display: inline;">
+                                <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure?')" style="padding: 0.4rem 0.7rem; font-size: 0.75rem;">
+                                    🗑️
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr th:if="${tasks.empty}">
+                        <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 3rem;">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">📭</div>
+                            <div style="font-size: 1.1rem; font-weight: 600;">No tasks assigned yet</div>
+                            <p style="margin-top: 0.5rem; color: var(--text-muted);">Start by creating your first task assignment</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+    </div>
+</body>
+</html>
